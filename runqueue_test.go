@@ -1,7 +1,6 @@
 package runqueue
 
 import (
-	"log"
 	"sync"
 	"testing"
 	"time"
@@ -18,7 +17,7 @@ func TestRunQueueConsistency(t *testing.T) {
 		wg.Done()
 	}
 
-	rq := New("test", log.Printf)
+	rq := New("test")
 
 	for i := 0; i < 2000; i++ {
 		wg.Add(1)
@@ -36,7 +35,7 @@ func TestRunQueueStop(t *testing.T) {
 	fn := func() {
 		time.Sleep(time.Millisecond * 500)
 	}
-	rq := New("test", log.Printf)
+	rq := New("test")
 	rq.Run(fn)
 
 	c := make(chan struct{})

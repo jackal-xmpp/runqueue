@@ -1,10 +1,9 @@
 package runqueue
 
 import (
-	"runtime"
 	"sync/atomic"
 
-	"github.com/jackal-xmpp/runqueue/mpsc"
+	"github.com/jackal-xmpp/runqueue/v2/mpsc"
 )
 
 const (
@@ -19,18 +18,16 @@ type RunQueue struct {
 	messageCount int32
 	state        int32
 	stopped      int32
-	logPanicFn   func(format string, args ...interface{})
 }
 
 type funcMessage struct{ fn func() }
 type stopMessage struct{ stopCb func() }
 
 // New returns an initialized lock-free operation queue.
-func New(name string, logPanicFn func(format string, args ...interface{})) *RunQueue {
+func New(name string) *RunQueue {
 	return &RunQueue{
-		name:       name,
-		queue:      mpsc.New(),
-		logPanicFn: logPanicFn,
+		name:  name,
+		queue: mpsc.New(),
 	}
 }
 
@@ -84,12 +81,6 @@ process:
 }
 
 func (m *RunQueue) run() {
-	defer func() {
-		if err := recover(); err != nil {
-			m.logStackTrace(err)
-		}
-	}()
-
 	for {
 		switch msg := m.queue.Pop().(type) {
 		case *funcMessage:
@@ -103,14 +94,5 @@ func (m *RunQueue) run() {
 		default:
 			return
 		}
-	}
-}
-
-func (m *RunQueue) logStackTrace(err interface{}) {
-	stackSlice := make([]byte, 4096)
-	s := runtime.Stack(stackSlice, false)
-
-	if m.logPanicFn != nil {
-		m.logPanicFn("runqueue '%s' panicked with error: %v\n%s", m.name, err, stackSlice[0:s])
 	}
 }
