@@ -9,7 +9,7 @@
 
 ### Installation
 ```bash
-go get -u github.com/jackal-xmpp/runqueue
+go get -u github.com/jackal-xmpp/runqueue/v2
 ```
 
 ### Usage
@@ -23,7 +23,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/jackal-xmpp/runqueue"
+    "github.com/jackal-xmpp/runqueue/v2"
 )
 
 func main() {
